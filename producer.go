@@ -171,14 +171,15 @@ func (p *Producer) loop() {
 	defer ticker.Stop()
 
 	for {
+		state, err := p.push()
+		if p.opt.AfterPush != nil {
+			p.opt.AfterPush(state, err)
+		}
+
 		select {
 		case <-p.ctx.Done():
 			return
 		case <-ticker.C:
-			state, err := p.push()
-			if p.opt.AfterPush != nil {
-				p.opt.AfterPush(state, err)
-			}
 		}
 	}
 }
